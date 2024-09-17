@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Relay Control</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #4CAF50;
+        }
+
+        button {
+            display: inline-block;
+            background-color: #4CAF50; /* Green background */
+            color: white; /* White text */
+            border: none;
+            padding: 15px 32px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button.off {
+            background-color: #f44336; /* Red background */
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ESP32 Relay Control</h1>
+
+    <button onclick="sendCommand('turn_on')">Turn On Relay</button>
+    <button class="off" onclick="sendCommand('turn_off')">Turn Off Relay</button>
+
+    <script>
+        function sendCommand(command) {
+            fetch('http://your-esp32-ip-address/command', {  // Replace with your ESP32 IP address
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    command: command
+                })
+            }).then(response => response.text())
+            .then(data => alert("Response: " + data))
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+
+</body>
+</html>
