@@ -11,53 +11,106 @@
             text-align: center;
         }
 
-        h1 {
-            color: #4CAF50;
-        }
-
         button {
-            display: inline-block;
             background-color: #4CAF50; /* Green background */
-            color: white; /* White text */
-            border: none;
+            color: white;
             padding: 15px 32px;
             font-size: 16px;
-            margin: 10px;
-            cursor: pointer;
             border-radius: 5px;
+            border: none;
+            cursor: pointer;
         }
 
         button.off {
             background-color: #f44336; /* Red background */
         }
 
-        button:hover {
-            opacity: 0.8;
+        .led {
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            margin: 10px;
+        }
+
+        .led.on {
+            background-color: green; /* Relay ON */
+        }
+
+        .led.off {
+            background-color: red; /* Relay OFF */
         }
     </style>
 </head>
 <body>
-
     <h1>ESP32 Relay Control</h1>
 
-    <button onclick="sendCommand('turn_on')">Turn On Relay</button>
-    <button class="off" onclick="sendCommand('turn_off')">Turn Off Relay</button>
+    <!-- LED to show the current state of the relay -->
+    <div>
+        <span class="led" id="relay-led"></span>
+    </div>
+
+    <!-- Toggle Button for Relay On/Off -->
+    <button id="toggle-button" onclick="toggleRelay()">Toggle Relay</button>
 
     <script>
-        function sendCommand(command) {
-            fetch('http://your-esp32-ip-address/command', {  // Replace with your ESP32 IP address
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    command: command
+        // Set the ESP32 URL
+        const esp32Url = 'http://10.0.0.144'; // Replace with your ESP32 IP address
+
+        // Function to toggle the relay state
+        function toggleRelay() {
+            // Fetch the current state first, then toggle it
+            fetch(`${esp32Url}/getState`)
+            .then(response => response.json())
+            .then(state => {
+                // Toggle the state (if on, turn off, and vice versa)
+                const newState = state.relay === 'on' ? 'off' : 'on';
+                
+                // Send the new state to the ESP32
+                fetch(`${esp32Url}/toggle`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ command: newState }),
                 })
-            }).then(response => response.text())
-            .then(data => alert("Response: " + data))
+                .then(response => response.text())
+                .then(() => {
+                    updateUI(newState); // Update the UI with the new state
+                })
+                .catch(error => console.error('Error:', error));
+            })
             .catch(error => console.error('Error:', error));
         }
-    </script>
 
+        // Function to update the LED and button state
+        function updateUI(state) {
+            const led = document.getElementById('relay-led');
+            const button = document.getElementById('toggle-button');
+
+            if (state === 'on') {
+                led.classList.remove('off');
+                led.classList.add('on');
+                button.textContent = "Turn Off Relay";
+            } else {
+                led.classList.remove('on');
+                led.classList.add('off');
+                button.textContent = "Turn On Relay";
+            }
+        }
+
+        // Function to check the relay state when the page loads
+        function checkRelayState() {
+            fetch(`${esp32Url}/getState`)
+            .then(response => response.json())
+            .then(state => {
+                updateUI(state.relay); // Update the UI with the current state
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Check the relay state when the page loads
+        window.onload = checkRelayState;
+    </script>
 </body>
 </html>
