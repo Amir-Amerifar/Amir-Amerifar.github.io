@@ -1,77 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESP32 Relay Control</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            text-align: center;
-        }
-
-        h1 {
-            color: #4CAF50;
-        }
-
-        button {
-            display: inline-block;
-            background-color: #4CAF50; /* Green background */
-            color: white; /* White text */
-            border: none;
-            padding: 15px 32px;
-            font-size: 16px;
-            margin: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        button.off {
-            background-color: #f44336; /* Red background */
-        }
-
-        button:hover {
-            opacity: 0.8;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relay Control & User Registration</title>
+  <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
+  <style>
+    #status {
+      font-size: 18px;
+      margin: 10px;
+      padding: 10px;
+    }
+    .led {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .led.on { background-color: green; }
+    .led.off { background-color: red; }
+  </style>
 </head>
 <body>
 
-    <h1>ESP32 Relay Control</h1>
+  <h1>Relay Control and Email Registration</h1>
 
-    <button onclick="sendCommand('turn_on')">Turn On Relay</button>
-    <button class="off" onclick="sendCommand('turn_off')">Turn Off Relay</button>
+  <div>
+    <label for="email">Enter your email to register:</label>
+    <input type="email" id="email" placeholder="Enter email">
+    <button id="sendEmail">Send Registration Email</button>
+  </div>
 
-    <script>
-        function sendCommand(command) {
-            fetch('http:10.0.0.144/relay/test', {  // Replace with your ESP32 IP address
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    command: command
-                })
-            }).then(response => response.text())
-            .then(data => alert("Response: " + data))
-            .catch(error => console.error('Error:', error));
-        }
-        
-        // Function to check the relay state when the page loads
-        function checkRelayState() {
-            fetch(`${esp32Url}/getState`)
-            .then(response => response.json())
-            .then(state => {
-                updateUI(state.relay); // Update the UI with the current state
-            })
-            .catch(error => console.error('Error:', error));
-        }
+  <h2>Relay Control</h2>
+  <button id="toggleRelay">Toggle Relay</button>
+  <div id="status">Relay Status: <span id="relayStatus">Unknown</span></div>
+  <div class="led off" id="ledIndicator"></div>
 
-        // Check the relay state when the page loads
-        window.onload = checkRelayState;
-         
-    </script>
+  <script src="firebase_realtime.js"></script>
 
 </body>
 </html>
