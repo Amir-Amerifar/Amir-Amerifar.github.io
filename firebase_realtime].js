@@ -1,13 +1,4 @@
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAczUdXPA_ZHJ_QPaqpVmdpdsirFP5VNNI",
-  authDomain: "sch-relay.firebaseapp.com",
-  projectId: "sch-relay",
-  storageBucket: "sch-relay.appspot.com",
-  messagingSenderId: "753644384827",
-  appId: "1:753644384827:web:c4e2125167aff51eaaa21e",
-  measurementId: "G-G1WVMJ9XZ2"
-};
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
